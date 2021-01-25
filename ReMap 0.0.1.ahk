@@ -1,117 +1,171 @@
-﻿
-#UseHook
-IniRead, Key1, IniFile.ini, Section, Key1, % A_Space
-IniRead, Key2, IniFile.ini, Section, Key2, % A_Space 
-IniRead, Key3, IniFile.ini, Section, Key3, % A_Space
-IniRead, Key4, IniFile.ini, Section, Key4, % A_Space
-IniRead, Key5, IniFile.ini, Section, Key5, % A_Space
-IniRead, Key6, IniFile.ini, Section, Key6, % A_Space
+#SingleInstance force
+#NoEnv
+SetBatchLines, -1
 
-Gui, Add, Hotkey, vKey1, % Key1
-Gui, Add, Hotkey, vKey2, % Key2
-Gui, Add, Hotkey, vKey3, % Key3
-Gui, Add, Hotkey, vKey4, % Key4
-Gui, Add, Hotkey, vKey5, % Key5
-Gui, Add, Hotkey, vKey6, % Key6
+#ctrls = 6  ;How many Hotkey controls to add?
+Loop,% #ctrls {
+ Gui, Add, Text, xm, Enter Hotkey #%A_Index%:
+ IniRead, savedHK%A_Index%, Hotkeys.ini, Hotkeys, %A_Index%, %A_Space%
+ If savedHK%A_Index%                                       ;Check for saved hotkeys in INI file.
+  Hotkey,% savedHK%A_Index%, Label%A_Index%                 ;Activate saved hotkeys if found.
+ StringReplace, noMods, savedHK%A_Index%, ~                  ;Remove tilde (~) and Win (#) modifiers...
+ StringReplace, noMods, noMods, #,,UseErrorLevel              ;They are incompatible with hotkey controls (cannot be shown).
+ Gui, Add, Hotkey, x+6 vHK%A_Index% gGuiLabel, %noMods%        ;Add hotkey controls and show saved hotkeys.
+ Gui, Add, CheckBox, x+6 vCB%A_Index% Checked%ErrorLevel%, Win  ;Add checkboxes to allow the Windows key (#) as a modifier...
+}                                                                ;Check the box if Win modifier is used.
+Gui, Show,,Re:Map 0.0.2
+  r = vk0x8
+  s1 = {%Label1%}{vk0x67}{%r%}
+  s2 = {%Label2%}{vk0x68}{%r%}
+  s3 = {%Label3%}{vk0x64}{%r%}
+  s4 = {%Label4%}{vk0x65}{%r%}
+  s5 = {%Label5%}{vk0x61}{%r%}
+  s6 = {%Label6%}{vk0x62}{%r%}
+  SBF = {alt down}{Numpad3 down}{Numpad2 down}{alt up}{Numpad3 up}{Numpad2 up}
+return
+GuiClose:
+ ExitApp
 
-Gui, Add, Button, gSave, Save
-Gui, Show, w250 h200, ReMap 0.0.1
+GuiLabel:
+ If %A_GuiControl% in +,^,!,+^,+!,^!,+^!    ;If the hotkey contains only modifiers, return to wait for a key.
+  return
+ If InStr(%A_GuiControl%,"vk07")            ;vk07 = MenuMaskKey (see below)
+  GuiControl,,%A_GuiControl%, % lastHK      ;Reshow the hotkey, because MenuMaskKey clears it.
+ Else
+  validateHK(A_GuiControl)
 return
 
-Save:
-  Gui, Submit, NoHide
-  Hotkey, % PrKey1, off, UseErrorLevel
-  Hotkey, % PrKey1 := Key1, Key1, on, UseErrorLevel
-  Hotkey, % PrKey2, off, UseErrorLevel
-  Hotkey, % PrKey2 := Key2, Key2, on, UseErrorLevel
-  Hotkey, % PrKey3, off, UseErrorLevel
-  Hotkey, % PrKey3 := Key3, Key3, on, UseErrorLevel
-  Hotkey, % PrKey4, off, UseErrorLevel
-  Hotkey, % PrKey4 := Key4, Key4, on, UseErrorLevel
-  Hotkey, % PrKey5, off, UseErrorLevel
-  Hotkey, % PrKey5 := Key5, Key5, on, UseErrorLevel
-  Hotkey, % PrKey6, off, UseErrorLevel
-  Hotkey, % PrKey6 := Key6, Key6, on, UseErrorLevel
-  IniWrite, % Key1, IniFile.ini, Section, Key1
-  IniWrite, % Key2, IniFile.ini, Section, Key2
-  IniWrite, % Key3, IniFile.ini, Section, Key3
-  IniWrite, % Key4, IniFile.ini, Section, Key4
-  IniWrite, % Key5, IniFile.ini, Section, Key5
-  IniWrite, % Key6, IniFile.ini, Section, Key6
-  s1 = vk0x67
-  s2 = vk0x68
-  s3 = vk0x64
-  s4 = vk0x65
-  s5 = vk0x62
-  s6 = vk0x61
-  r = vk0x8
+validateHK(GuiControl) {
+ global lastHK
+ Gui, Submit, NoHide
+ lastHK := %GuiControl%                     ;Backup the hotkey, in case it needs to be reshown.
+ num := SubStr(GuiControl,3)                ;Get the index number of the hotkey control.
+ If (HK%num% != "") {                       ;If the hotkey is not blank...
+  StringReplace, HK%num%, HK%num%, SC15D, AppsKey      ;Use friendlier names,
+  StringReplace, HK%num%, HK%num%, SC154, PrintScreen  ;  instead of these scan codes.
+  If CB%num%                                ;  If the 'Win' box is checked, then add its modifier (#).
+   HK%num% := "#" HK%num%
+  checkDuplicateHK(num)
+ }
+ If (savedHK%num% || HK%num%)               ;Unless both are empty,
+  setHK(num, savedHK%num%, HK%num%)         ;  update INI/GUI
+}
+
+checkDuplicateHK(num) {
+ global #ctrls
+ Loop,% #ctrls
+  If (HK%num% = savedHK%A_Index%) {
+   dup := A_Index
+   Loop,6 {
+    GuiControl,% "Disable" b:=!b, HK%dup%   ;Flash the original hotkey to alert the user.
+    Sleep,200
+   }
+   GuiControl,,HK%num%,% HK%num% :=""       ;Delete the hotkey and clear the control.
+   break
+  }
+}
+
+setHK(num,INI,GUI) {
+ If INI                           ;If previous hotkey exists,
+  Hotkey, %INI%, Label%num%, Off  ;  disable it.
+ If GUI                           ;If new hotkey exists,
+  Hotkey, %GUI%, Label%num%, On   ;  enable it.
+ IniWrite,% GUI ? GUI:null, Hotkeys.ini, Hotkeys, %num%
+ savedHK%num%  := HK%num%
+ TrayTip, Label%num%,% !INI ? GUI " ON":!GUI ? INI " OFF":GUI " ON`n" INI " OFF"
+}
+
+#MenuMaskKey vk07                 ;Requires AHK_L 38+
+#If ctrl := HotkeyCtrlHasFocus()
+ *AppsKey::                       ;Add support for these special keys,
+ *BackSpace::                     ;  which the hotkey control does not normally allow.
+ *Delete::
+ *Enter::
+ *Escape::
+ *Pause::
+ *PrintScreen::
+ *Space::
+ *Tab::
+  modifier := ""
+  If GetKeyState("Shift","P")
+   modifier .= "+"
+  If GetKeyState("Ctrl","P")
+   modifier .= "^"
+  If GetKeyState("Alt","P")
+   modifier .= "!"
+  Gui, Submit, NoHide             ;If BackSpace is the first key press, Gui has never been submitted.
+  If (A_ThisHotkey == "*BackSpace" && %ctrl% && !modifier)   ;If the control has text but no modifiers held,
+   GuiControl,,%ctrl%                                       ;  allow BackSpace to clear that text.
+  Else                                                     ;Otherwise,
+   GuiControl,,%ctrl%, % modifier SubStr(A_ThisHotkey,2)  ;  show the hotkey.
+  validateHK(ctrl)
+ return
+#If
+
+HotkeyCtrlHasFocus() {
+ GuiControlGet, ctrl, Focus       ;ClassNN
+ If InStr(ctrl,"hotkey") {
+  GuiControlGet, ctrl, FocusV     ;Associated variable
+  Return, ctrl
+ }
+}
+
+;These labels may contain any commands for their respective hotkeys to perform.
+Label1:
+  Loop 1
+  {
+      if A_ThisHotkey = Space
+      SendInput, %SBF%{vk0x67}{%r%}
+      else
+      SendInput, %s1%
+  }
+  return
+Label2:
+  Loop 1
+  {
+      if A_ThisHotkey = Space
+      SendInput, %SBF%{vk0x67}{%r%}
+      else
+      SendInput, %s2%
+  }
   return
 
-#IfWinActive Warcraft III
-#SingleInstance force   ;force a single instance
-#HotkeyInterval 0   ;disable the warning dialog if a key is held down
-#InstallKeybdHook   ;Forces the unconditional installation of the keyboard hook
-#UseHook On     ;might increase responsiveness of hotkeys
-#MaxThreads 20      ;use 20 (the max) instead of 10 threads
-SetBatchLines, -1   ;makes the script run at max speed
-SetKeyDelay , -1, 0   ;faster response (might be better with -1, 0)
-;Thread, Interrupt , -1, -1 ;not sure what this does, could be bad for timers
-SetTitleMatchMode Regex
-SetDefaultMouseSpeed, 0 ;Move the mouse faster for mouse moving commands
-Process, Priority, AutoHotkey.exe, High
-Key1:
+Label3:
   Loop 1
   {
-    if not GetKeyState("Key1" "P")
-      SendInput, {%A_ThisHotkey%}
-      SendInput, {%s1%}
-      SendInput, {%r%}
-  }
-  return
-Key2:
-  Loop 1
-  {
-    if not GetKeyState("Key2" "P")
-      SendInput, {%A_ThisHotkey%}
-      SendInput, {%s2%}
-      SendInput, {%r%}
+      if A_ThisHotkey = Space
+      SendInput, %SBF%{vk0x67}{%r%}
+      else
+      SendInput, %s3%
   }
   return
 
-Key3:
+Label4:
   Loop 1
   {
-      SendInput, {%A_ThisHotkey%}
-      SendInput, {%s3%}
-      SendInput, {%r%}
+      if A_ThisHotkey = Space
+      SendInput, %SBF%{vk0x67}{%r%}
+      else
+      SendInput, %s4%
   }
   return
 
-Key4:
+Label5:
   Loop 1
   {
-      SendInput, {%A_ThisHotkey%}
-      SendInput, {%s4%}
-      SendInput, {%r%}
+      if A_ThisHotkey = Space
+      SendInput, %SBF%{vk0x67}{%r%}
+      else
+      SendInput, %s5%
   }
   return
 
-Key5:
+Label6:
   Loop 1
   {
-      SendInput, {%A_ThisHotkey%}
-      SendInput, {%s5%}
-      SendInput, {%r%}
+      if A_ThisHotkey = Space
+      SendInput, %SBF%{vk0x67}{%r%}
+      else
+      SendInput, %s6%
   }
   return
-
-Key6:
-  Loop 1
-  {
-      SendInput, {%A_ThisHotkey%}
-      SendInput, {%s6%}
-      SendInput, {%r%}
-  }
-  return
-GuiClose:
-  ExitApp
