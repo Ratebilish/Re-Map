@@ -69,7 +69,7 @@ Key2:
   Loop 1
   {
       if A_ThisHotkey = Space
-      SendInput, %SBF%{vk0x67}{%r%}
+      SendInput, %SBF%{vk0x68}{%r%}
       else
       SendInput, %s2%
   }
@@ -79,7 +79,7 @@ Key3:
   Loop 1
   {
       if A_ThisHotkey = Space
-      SendInput, %SBF%{vk0x67}{%r%}
+      SendInput, %SBF%{vk0x64}{%r%}
       else
       SendInput, %s3%
   }
@@ -89,7 +89,7 @@ Key4:
   Loop 1
   {
       if A_ThisHotkey = Space
-      SendInput, %SBF%{vk0x67}{%r%}
+      SendInput, %SBF%{vk0x65}{%r%}
       else
       SendInput, %s4%
   }
@@ -99,7 +99,7 @@ Key5:
   Loop 1
   {
       if A_ThisHotkey = Space
-      SendInput, %SBF%{vk0x67}{%r%}
+      SendInput, %SBF%{vk0x61}{%r%}
       else
       SendInput, %s5%
   }
@@ -109,7 +109,7 @@ Key6:
   Loop 1
   {
       if A_ThisHotkey = Space
-      SendInput, %SBF%{vk0x67}{%r%}
+      SendInput, %SBF%{vk0x62}{%r%}
       else
       SendInput, %s6%
   }
