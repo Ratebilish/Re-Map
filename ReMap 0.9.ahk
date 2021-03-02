@@ -15,8 +15,8 @@ s1 = vk0x67
 s2 = vk0x68
 s3 = vk0x64
 s4 = vk0x65
-s5 = vk0x62
-s6 = vk0x61
+s5 = vk0x61
+s6 = vk0x62
 r = vk0x8
 SBF = {alt down}{Numpad3 down}{Numpad2 down}{alt up}{Numpad3 up}{Numpad2 up}
 
