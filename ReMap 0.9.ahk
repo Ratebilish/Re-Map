@@ -46,7 +46,7 @@ SBF = {alt down}{Numpad3 down}{Numpad2 down}{alt up}{Numpad3 up}{Numpad2 up}
     SendInput, {%A_ThisHotkey%}{%s2%}{%r%}
   }
   return
-~+Key2::
+~+2::
   {
     if A_ThisHotkey = Space
     SendInput, %SBF%{%s2%}{%r%}
