@@ -21,103 +21,16 @@ r = vk0x8
 SBF = {alt down}{Numpad3 down}{Numpad2 down}{alt up}{Numpad3 up}{Numpad2 up}
 
 1::
-  {
-    if A_ThisHotkey = Space
-    SendInput, %SBF%{%s1%}{%r%}
-    else
-    SendInput, {%A_ThisHotkey%}{%s1%}{%r%}
-  }
-  return
 ~+1::
-  {
-    if A_ThisHotkey = Space
-    SendInput, %SBF%{%s1%}{%r%}
-    else
-    SendInput, {ShiftUp}{%s1%}{ShiftDown}{%r%}
-  }
-  return
-
-
 2::
-  {
-    if A_ThisHotkey = Space
-    SendInput, %SBF%{%s2%}{%r%}
-    else
-    SendInput, {%A_ThisHotkey%}{%s2%}{%r%}
-  }
-  return
 ~+2::
-  {
-    if A_ThisHotkey = Space
-    SendInput, %SBF%{%s2%}{%r%}
-    else
-    SendInput, {%A_ThisHotkey%}{%s2%}{%r%}
-  }
-  return
-
-
 3::
-  {
-    if A_ThisHotkey = Space
-    SendInput, %SBF%{%s3%}{%r%}
-    else
-    SendInput, {%A_ThisHotkey%}{%s3%}{%r%}
-  }
-  return
 ~+3::
-  {
-    if A_ThisHotkey = Space
-    SendInput, %SBF%{%s3%}{%r%}
-    else
-    SendInput, {%A_ThisHotkey%}{%s3%}{%r%}
-  }
-  return
-
-
 4::
-  {
-    if A_ThisHotkey = Space
-    SendInput, %SBF%{%s4%}{%r%}
-    else
-    SendInput, {%A_ThisHotkey%}{%s4%}{%r%}
-  }
-  return
 ~+4::
-  {
-    if A_ThisHotkey = Space
-    SendInput, %SBF%{%s4%}{%r%}
-    else
-    SendInput, {%A_ThisHotkey%}{%s4%}{%r%}
-  }
-  return
-
-
 Space::
-  {
-    if A_ThisHotkey = Space
-    SendInput, %SBF%{%s5%}{%r%}
-    else
-    SendInput, {%A_ThisHotkey%}{%s5%}{%r%}
-  }
-  return
 ~+Space::
-  {
-    if A_ThisHotkey = Space
-    SendInput, %SBF%{%s5%}{%r%}
-    else
-    SendInput, {%A_ThisHotkey%}{%s5%}{%r%}
-  }
-  return
-
-
 6::
-  {
-    if A_ThisHotkey = Space
-    SendInput, %SBF%{%s6%}{%r%}
-    else
-    SendInput, {%A_ThisHotkey%}{%s6%}{%r%} 
-  }
-  return
 ~+6::
   {
     if A_ThisHotkey = Space
